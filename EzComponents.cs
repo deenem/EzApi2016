@@ -814,12 +814,22 @@ namespace Microsoft.SqlServer.SSIS.EzAPI
         public string IdentificationString { get { return m_meta.IdentificationString; } }
         public int LocaleID { get { return m_meta.LocaleID; } set { m_meta.LocaleID = value; } }
 
+        private IDTSVirtualInputColumnCollection100 VirtualInputColumnCollection = null;
+        private HashSet<string> VirtualInputColumnNames;
+
         public bool VirtualInputColumnExists(int inputInd, string colName)
         {
-            IDTSVirtualInputColumnCollection100 cols = m_meta.InputCollection[inputInd].GetVirtualInput().VirtualInputColumnCollection;
-            for (int i = 0; i < cols.Count; i++)
-                if (string.Compare(cols[i].Name, colName, StringComparison.OrdinalIgnoreCase) == 0)
-                    return true;
+            if (VirtualInputColumnCollection == null)
+            {
+                VirtualInputColumnCollection = m_meta.InputCollection[inputInd].GetVirtualInput().VirtualInputColumnCollection;
+                VirtualInputColumnNames = new HashSet<string>();
+                for (int i = 0; i < VirtualInputColumnCollection.Count; i++)
+                    VirtualInputColumnNames.Add(VirtualInputColumnCollection[i].Name.ToLower());
+            }
+
+            if (VirtualInputColumnNames.Contains(colName.ToLower()))
+                return true;
+
             return false;
         }
 
@@ -828,12 +838,22 @@ namespace Microsoft.SqlServer.SSIS.EzAPI
             return VirtualInputColumnExists(0, colName);
         }
 
+        private IDTSInputColumnCollection100 InputColumnCollection = null;
+        private HashSet<string> InputColumnNames;
+
         public bool InputColumnExists(int inputInd, string colName)
         {
-            IDTSInputColumnCollection100 cols = m_meta.InputCollection[inputInd].InputColumnCollection;
-            for (int i = 0; i < cols.Count; i++)
-                if (string.Compare(cols[i].Name, colName, StringComparison.OrdinalIgnoreCase) == 0)
-                    return true;
+            if (InputColumnCollection == null)
+            {
+                InputColumnCollection = m_meta.InputCollection[inputInd].InputColumnCollection;
+                InputColumnNames = new HashSet<string>();
+                for (int i = 0; i < InputColumnCollection.Count; i++)
+                    InputColumnNames.Add(InputColumnCollection[i].Name.ToLower());
+            }
+
+            if (InputColumnNames.Contains(colName.ToLower()))
+                return true;
+
             return false;
         }
 
@@ -847,21 +867,40 @@ namespace Microsoft.SqlServer.SSIS.EzAPI
             return OutputColumnExists(0, colName);
         }
 
+        private IDTSOutputColumnCollection100 OutputColumnCollection = null;
+        private HashSet<string> OutputColumnNames;
+
         public bool OutputColumnExists(int outputInd, string colName)
         {
-            IDTSOutputColumnCollection100 cols = m_meta.OutputCollection[outputInd].OutputColumnCollection;
-            for (int i = 0; i < cols.Count; i++)
-                if (string.Compare(cols[i].Name, colName, StringComparison.OrdinalIgnoreCase) == 0)
-                    return true;
+            if (OutputColumnCollection == null)
+            {
+                OutputColumnCollection = m_meta.OutputCollection[outputInd].OutputColumnCollection;
+                OutputColumnNames = new HashSet<string>();
+                for (int i = 0; i < OutputColumnCollection.Count; i++)
+                    OutputColumnNames.Add(OutputColumnCollection[i].Name.ToLower());
+            }
+
+            if (OutputColumnNames.Contains(colName.ToLower()))
+                return true;
+
             return false;
         }
 
+        private IDTSExternalMetadataColumnCollection100 ExternalMetadataColumnCollection = null;
+        private HashSet<string> ExternalMetadataColumnNames;
         public bool ExternalColumnExists(int inputInd, string colName)
         {
-            IDTSExternalMetadataColumnCollection100 cols = m_meta.InputCollection[inputInd].ExternalMetadataColumnCollection;
-            for (int i = 0; i < cols.Count; i++)
-                if (string.Compare(cols[i].Name, colName, StringComparison.OrdinalIgnoreCase) == 0)
-                    return true;
+            if (ExternalMetadataColumnCollection == null)
+            {
+                ExternalMetadataColumnCollection = m_meta.InputCollection[inputInd].ExternalMetadataColumnCollection;
+                ExternalMetadataColumnNames = new HashSet<string>();
+                for (int i = 0; i < ExternalMetadataColumnCollection.Count; i++)
+                    ExternalMetadataColumnNames.Add(ExternalMetadataColumnCollection[i].Name.ToLower());
+            }
+                
+            if (ExternalMetadataColumnNames.Contains(colName.ToLower()))
+                return true;
+
             return false;
         }
 
